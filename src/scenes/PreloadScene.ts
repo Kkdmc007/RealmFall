@@ -6,7 +6,15 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
-        // Assets will be loaded here later
+        this.load.tilemapTiledJSON(
+    "forest",
+    "assets/maps/forest_01.json"
+);
+
+this.load.image(
+    "platformer",
+    "assets/images/tiles/platformer.png"
+);
     }
 
     create() {

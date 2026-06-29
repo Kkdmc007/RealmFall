@@ -2,38 +2,77 @@ import Phaser from "phaser";
 import Player from "../entities/Player";
 
 export default class ForestScene extends Phaser.Scene {
-
     private player!: Player;
-    private ground!: Phaser.Physics.Arcade.StaticGroup;
 
     constructor() {
         super("ForestScene");
     }
 
     create() {
+        // Create the map
+        const map = this.make.tilemap({ key: "forest" });
 
-        this.cameras.main.setBackgroundColor("#87CEEB");
+        // Add the tileset
+        const tileset = map.addTilesetImage(
+            "Platformer",
+            "platformer"
+        );
 
-        // Create ground texture
-        const graphics = this.make.graphics({ x: 0, y: 0, add: false });
-        graphics.fillStyle(0x3d8c40);
-        graphics.fillRect(0, 0, 64, 64);
-        graphics.generateTexture("ground", 64, 64);
-        graphics.destroy();
-
-        this.ground = this.physics.add.staticGroup();
-
-        for (let i = 0; i < 25; i++) {
-            this.ground.create(i * 64, 688, "ground")
-                .setOrigin(0, 0)
-                .refreshBody();
+        if (!tileset) {
+            console.error("Tileset not found!");
+            return;
         }
 
-        this.player = new Player(this, 150, 500);
+        // Create layers
+        const backgroundLayer = map.createLayer(
+            "Background",
+            tileset,
+            0,
+            0
+        );
 
-        this.physics.add.collider(this.player, this.ground);
+        const groundLayer = map.createLayer(
+            "Ground",
+            tileset,
+            0,
+            0
+        );
 
-        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+        const decorationLayer = map.createLayer(
+            "Decorations",
+            tileset,
+            0,
+            0
+        );
+
+        // Enable collisions on the Ground layer
+        groundLayer.setCollisionByExclusion([-1]);
+
+        // Create player
+        this.player = new Player(this, 100, 300);
+
+        // Player collides with the ground
+        this.physics.add.collider(this.player, groundLayer);
+
+        // Camera
+        this.cameras.main.setBounds(
+            0,
+            0,
+            map.widthInPixels,
+            map.heightInPixels
+        );
+
+        this.physics.world.setBounds(
+            0,
+            0,
+            map.widthInPixels,
+            map.heightInPixels
+        );
+
+        this.cameras.main.startFollow(this.player);
+
+        // Zoom (optional)
+        this.cameras.main.setZoom(2);
     }
 
     update() {
