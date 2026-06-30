@@ -13,7 +13,7 @@ export default class ForestScene extends Phaser.Scene {
     create() {
 
         //----------------------------------
-        // Create Player Animations
+        // Create Animations
         //----------------------------------
 
         PlayerAnimations.create(this);
@@ -32,8 +32,11 @@ export default class ForestScene extends Phaser.Scene {
         );
 
         if (!tileset) {
+
             console.error("Tileset not found!");
+
             return;
+
         }
 
         //----------------------------------
@@ -62,8 +65,11 @@ export default class ForestScene extends Phaser.Scene {
         );
 
         if (!groundLayer) {
+
             console.error("Ground layer not found!");
+
             return;
+
         }
 
         groundLayer.setCollisionByExclusion([-1]);
@@ -84,7 +90,7 @@ export default class ForestScene extends Phaser.Scene {
         );
 
         //----------------------------------
-        // Camera
+        // World Bounds
         //----------------------------------
 
         this.physics.world.setBounds(
@@ -94,16 +100,29 @@ export default class ForestScene extends Phaser.Scene {
             map.heightInPixels
         );
 
-        this.cameras.main.setBounds(
+        //----------------------------------
+        // Camera
+        //----------------------------------
+
+        const camera = this.cameras.main;
+
+        camera.setBounds(
             0,
             0,
             map.widthInPixels,
             map.heightInPixels
         );
 
-        this.cameras.main.startFollow(this.player);
+        camera.startFollow(
+            this.player,
+            true,
+            0.08,
+            0.08
+        );
 
-        this.cameras.main.setZoom(2);
+        camera.setZoom(2);
+
+        camera.roundPixels = true;
 
     }
 
