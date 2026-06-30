@@ -1,7 +1,9 @@
 import Phaser from "phaser";
 import Player from "../entities/Player";
+import PlayerAnimations from "../animations/PlayerAnimations";
 
 export default class ForestScene extends Phaser.Scene {
+
     private player!: Player;
 
     constructor() {
@@ -9,10 +11,21 @@ export default class ForestScene extends Phaser.Scene {
     }
 
     create() {
-        // Create the map
-        const map = this.make.tilemap({ key: "forest" });
 
-        // Add the tileset
+        //----------------------------------
+        // Create Player Animations
+        //----------------------------------
+
+        PlayerAnimations.create(this);
+
+        //----------------------------------
+        // Load Tilemap
+        //----------------------------------
+
+        const map = this.make.tilemap({
+            key: "forest"
+        });
+
         const tileset = map.addTilesetImage(
             "Platformer",
             "platformer"
@@ -23,8 +36,11 @@ export default class ForestScene extends Phaser.Scene {
             return;
         }
 
-        // Create layers
-        const backgroundLayer = map.createLayer(
+        //----------------------------------
+        // Layers
+        //----------------------------------
+
+        map.createLayer(
             "Background",
             tileset,
             0,
@@ -38,29 +54,38 @@ export default class ForestScene extends Phaser.Scene {
             0
         );
 
-        const decorationLayer = map.createLayer(
+        map.createLayer(
             "Decorations",
             tileset,
             0,
             0
         );
 
-        // Enable collisions on the Ground layer
+        if (!groundLayer) {
+            console.error("Ground layer not found!");
+            return;
+        }
+
         groundLayer.setCollisionByExclusion([-1]);
 
-        // Create player
-        this.player = new Player(this, 100, 300);
+        //----------------------------------
+        // Player
+        //----------------------------------
 
-        // Player collides with the ground
-        this.physics.add.collider(this.player, groundLayer);
-
-        // Camera
-        this.cameras.main.setBounds(
-            0,
-            0,
-            map.widthInPixels,
-            map.heightInPixels
+        this.player = new Player(
+            this,
+            200,
+            100
         );
+
+        this.physics.add.collider(
+            this.player,
+            groundLayer
+        );
+
+        //----------------------------------
+        // Camera
+        //----------------------------------
 
         this.physics.world.setBounds(
             0,
@@ -69,13 +94,23 @@ export default class ForestScene extends Phaser.Scene {
             map.heightInPixels
         );
 
+        this.cameras.main.setBounds(
+            0,
+            0,
+            map.widthInPixels,
+            map.heightInPixels
+        );
+
         this.cameras.main.startFollow(this.player);
 
-        // Zoom (optional)
         this.cameras.main.setZoom(2);
+
     }
 
     update() {
+
         this.player.update();
+
     }
+
 }
